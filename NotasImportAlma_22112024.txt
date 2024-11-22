@@ -1,0 +1,78 @@
+Clase: ImportFITSCubeAlma.java
+Localización del paquete: es.cab.plugins.impor
+
+Métodos y localización en la clase:
+
+- Declaración de variables (Lineas 77-89). 
+- Declaració del lector de rows (lineas 92-95). 
+- importCube (el método más importante de la clase) (Lineas 99-421). 
+- changeValuesVeloOld (Lineas 423-512). 
+- setValue (Lineas 514-550). 
+- setBeamValues (Lineas 552-609). 
+- generateNewCube (Lineas 610-788). 
+- calculatesigma (Lineas 790-881). 
+- objArr2List (Lineas 1059-1108). 
+- unitcalculation (Lineas 1111- 1617).
+- calculateStdDev (Lineas 1619-1635). 
+
+Entre el método objArr2List y el método unitcalculation hay mucho código muerto. 
+En el método unitcalculation hay muchisimo código muerto, aproximadamente el 85% de las lineas que ocupa el método
+son código muerto). 
+
+******************************
+*** Análisis de importCube ***
+******************************
+- Primero se declaran variables. 
+
+Todo el proceso de este método está en un gran bloque try-catch. 
+Dentro de este bloque try-catch:
+   - Se declara el fits a partir de la string que se ha pasado al método como argumento. (Se lee). 
+   - Se obtiene el numero de HDUs. 
+   - Se declara y se obtiene el basicHdu. 
+
+**Nota**
+El basichdu parece ser una variable que se va usando y reusando en cada momento. No hay UN BASIC HDU, es el que se está
+usando en ese momento. 
+********
+
+   -initRow("CUBE") --> row[27] = 2000f y no 2000. 
+   -Se asignan unidades para ciertos valores de las rows. 
+
+   - Se procesa la posición 0
+      Se asigna el basichdu --> basicHdu = fits.getHDU(0)
+      Se asigna el origen -> FITS_HEADER_ORIGIN --> "ORIGIN". 
+
+   - Se insertan cards
+      processHead(basicHdu.getHeader()) TODO: Hay que repasar mejor este proceso y completar la información []
+         Es un método de la clase importFITS
+         Se le pasa un header, en este caso el header del basicHdu. 
+            Se inicia un cursor para recorrer el header. 
+            Se instancia un objeto HeaderCard y una string vacia KeyAux. 
+            Se va leyendo el cursor:
+               Se asigna que card es y si es una key jerarquica. 
+
+**Nota**
+getHierarchKey, un método de la clase importFITS
+Viene de la library nom.tam FITS, en particular del método getUseHierarchkey. 
+Es simplemente un booleano que es true or false dependiendo de si se usan HIERARCH keywords. 
+En FITS se usa HIERARCH keyword para definir keywords que son más largas que 8 caracteres o que contienen 
+caracteres no permitidos en las keywords estandar para FITS.
+********
+
+      En el processHead se hace uso de hdrOrigin (que pertenece a ImportFITS). Es un header que se declara sin más
+al principio de la clase. 
+      Se añade la key con value "ImportFile". 
+
+
+   - Si el origen es nulo se le asigna valor. 
+      Definido como constante --> FITS_HEADER_ORIGIN
+   - Un if para comprobar si el cubo es de CASA (podemos obviarlo al implemenar el importer de JWST). 
+
+   - Después de comprobar si es CASA o no, se vuelve a usar processHead()
+
+   - Se obtiene el desplazamiento de la imagen. 
+      offset --> getFileOffset + getOriginalSize
+     Esto lo hace cuando se cumple esta condición: "if basicHdu instanceof ImageHDU"
+
+
+
