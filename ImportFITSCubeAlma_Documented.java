@@ -532,8 +532,65 @@ public class ImportFITSCubeAlma extends ImportFITS {
            }
        }
 
+       /**
+       * Configura los valores del haz (beam) en la cabecera del archivo FITS.
+       *
+       * Este método extrae los valores del tamaño del haz (BMAJ, BMIN) y su orientación (BPA)
+       * desde una tabla binaria en el archivo FITS. Si es necesario, convierte las unidades
+       * de los valores a grados antes de asignarlos a la fila de datos (`RowImport`).
+       *
+       * @param fits Objeto `Fits` que contiene el archivo FITS abierto.
+       * @param row Fila de datos (`RowImport`) donde se asignarán los valores del haz.
+       * @param crpix3 Índice del eje espectral usado para localizar los valores del haz.
+       */
+       private void setBeamValues(Fits fits, RowImport row, double crpix3) {
+           try {
+               // Obtiene el HDU de tipo tabla binaria (posición 1).
+               BinaryTableHDU hdu = (BinaryTableHDU) fits.getHDU(1);
+               Header header = hdu.getHeader();
 
+               // Obtiene los valores del haz desde la tabla binaria.
+               float bMaj = ((float[]) hdu.getElement((int) crpix3, 0))[0]; // Tamaño mayor
+               float bMin = ((float[]) hdu.getElement((int) crpix3, 1))[0]; // Tamaño menor
+               float bpa = ((float[]) hdu.getElement((int) crpix3, 2))[0];  // Ángulo de posición
 
+               // Si los valores del haz son inválidos, no los procesa.
+               if (bMaj == 1.0E-6 || bpa == 0.0) {
+                   return;
+               }
+
+               // Obtiene las unidades de los valores desde la cabecera.
+               String unitBMaj = header.getStringValue("TUNIT1");
+               String unitBMin = header.getStringValue("TUNIT2");
+               String unitBPA = header.getStringValue("TUNIT3");
+
+               // Convierte los valores a grados si las unidades están definidas.
+               Unit unitOriBMaj = Unit.parse(unitBMaj);
+               Unit unitOriBMin = Unit.parse(unitBMin);
+               Unit unitOriBPA = Unit.parse(unitBPA);
+
+               if (unitOriBMaj != null) {
+                   bMaj = (float) unitOriBMaj.getValue((double) bMaj, Angle.DEGREES);
+               }
+               if (unitOriBMin != null) {
+                   bMin = (float) unitOriBMin.getValue((double) bMin, Angle.DEGREES);
+               }
+               if (unitOriBPA != null) {
+                   bpa = (float) unitOriBPA.getValue((double) bpa, Angle.DEGREES);
+               }
+
+               // Asigna los valores procesados al objeto `row`.
+               row.set(BMAJ, bMaj);
+               row.set(BMIN, bMin);
+               row.set(BPA, bpa);
+           } catch (FitsException e) {
+               // Manejo de errores de FITS.
+               e.printStackTrace();
+           } catch (IOException e) {
+               // Manejo de errores de entrada/salida.
+               e.printStackTrace();
+           }
+       }
 
 
 
