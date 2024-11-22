@@ -117,3 +117,26 @@ Parámetros:
 Utiliza UnitTransformator para cambiar entre diferentes sistemas espectrales y unidades (por ejemplo, de km/s a m/s). 
 También se asegura de que las transformaciones sean consistentes con el sistema espectral (VOPT, VRAD, etc.) definido 
 en el objeto WCSGlobal.
+
+**************************
+***Analisis de setValue***
+**************************
+Este método asigna un valor a una etiqueta específica dentro de la fila de datos (RowImport) utilizada para procesar
+ el archivo FITS. Adapta el valor al tipo adecuado antes de asignarlo, garantizando la consistencia del dato con el 
+formato esperado.
+Parámetros:
+   typeClass: Entero que indica el tipo de dato del valor:
+      0: String
+      1: Integer
+      2: Short
+      3: Float
+      4: Double
+      5: Long
+   valueLabel: La etiqueta asociada al valor (por ejemplo, CRVAL1, RESTFREQ).
+   valueData: Valor en formato String que será convertido al tipo correspondiente.
+
+- El switch determina el tipo de dato basado en typeClass y realiza la conversión necesaria (por ejemplo, String a 
+Integer).
+- Utiliza el método set del objeto row para asociar la etiqueta (valueLabel) con el valor convertido.
+Maneja conversiones seguras desde String a tipos numéricos como int, float, etc.
+Si el tipo no está definido en el switch, se asigna el valor como un String.
