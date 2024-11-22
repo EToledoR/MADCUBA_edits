@@ -372,4 +372,125 @@ public class ImportFITSCubeAlma extends ImportFITS {
     }
 
     // Métodos adicionales: validación de unidades, cálculo de sigma, conversión de datos, etc.
+
+   /**
+   * Cambia los valores de velocidad (radial, óptica, o desplazamiento al rojo) en la cabecera del archivo FITS.
+   *
+   * Este método procesa una lista de argumentos que contienen ajustes para las velocidades espectrales,
+   * identificados por etiquetas específicas como `VELO`, `VRAD`, `VOPT`, o `REDSHIFT`. Los valores son
+   * convertidos y actualizados en la cabecera del archivo FITS, garantizando la coherencia con el sistema
+   * de coordenadas espectrales definido en el objeto `WCSGlobal`.
+   * 
+   * @param listNewArgs Lista de argumentos con cambios en los valores espectrales (en formato `etiqueta$valor$unidad`).
+   * @param newArgs Cadena con los valores convertidos que se deben aplicar a la cabecera.
+   * @param hdr Cabecera del archivo FITS donde se aplicarán los cambios.
+   * @param wcsGlobal Objeto que gestiona el sistema de coordenadas espectrales y sus transformaciones.
+   * @return Una cadena actualizada con los nuevos argumentos aplicados a la cabecera.
+   */
+    public String changeValuesVeloOld(String listNewArgs, String newArgs,
+			Header hdr, WCSGlobal wcsGlobal) {
+		if(listNewArgs!=null && !listNewArgs.equals("None")&& !listNewArgs.equals(""))
+		{
+			  // Inicializa la cadena de argumentos convertidos
+                          newArgs = listNewArgs;
+
+                          // Tokeniza los argumentos de entrada usando '#' como delimitador
+			  StringTokenizer st= new StringTokenizer(listNewArgs, "#");
+			  String valueToken = "";
+			  int separatorIndex = -1;
+
+                          // Obtiene el transformador espectral del sistema de coordenadas
+			  SpectralTransformator spectTransformator = wcsGlobal.getWcsSpectral().getSt();
+
+                          // Itera sobre los tokens
+			  while(st.hasMoreTokens())
+			  {
+				valueToken = st.nextToken();
+
+				  separatorIndex = valueToken.indexOf("$");
+				  if(separatorIndex>-1)
+				  {
+                                        // Separa la etiqueta (ej: VELO, VRAD) del valor
+		  			String valueLabel = valueToken.substring(0, separatorIndex);
+		                        valueLabel = valueLabel.toUpperCase();
+		  			if(valueLabel.equals("VELO") ||valueLabel.equals("VRAD") || valueLabel.equals("VOPT")
+		  				 ||	valueLabel.equals("REDSHIFT"))
+		  			{
+		  				String valueData = valueToken.substring(separatorIndex+1);
+
+                                                // Procesa unidades si están especificadas
+		  				String valueUnit = null;
+		  				separatorIndex = valueData.indexOf("$");
+		  				if(separatorIndex>-1) //THEN HAS UNIT
+		  				{
+		  					valueUnit = valueData.substring(separatorIndex+1);
+		  					valueData = valueData.substring(0, separatorIndex);
+		  				}
+		  				//NEED THREE VALUES (ALTVAL, ALTPIX AND ZSOURCE)
+		  				//FIRTS LOOK VALUE UNIT 
+		  				//TODO 
+		  				//THEN INSERT VLAUE UNIT CORRECT IN UNIT CORRECT
+		  				//CALCULATE OTHERS PARAMS
+
+                                  // Convierte el valor dependiendo de la etiqueta
+		                  double newValue = new Double(valueData);
+		                  if(!valueLabel.equals("REDSHIFT") && valueUnit!=null && valueUnit.toLowerCase().startsWith("k")  	)//CHANGE UNIT CORRECTO LAS BASELINE OR CHANGE VALOCITY
+		                	  newValue = newValue*1000;
+
+		                 double[] values = null;
+
+                                 // Realiza conversiones dependiendo del sistema espectral
+		                 if (wcsGlobal.getWcsSpectral().getVelDef()
+		                         .startsWith(MyConstants.SPECTRAL_AXIS_TYPE_VOPT))
+		                 {
+		                	 if(valueLabel.equals("REDSHIFT"))
+		                		 newValue = UnitTransformator.tranfFromAnyChannelToOtherChannel(newValue,MyConstants.X_AXIS_REDSHIFT,
+		                                 MyConstants.X_AXIS_VOPT,spectTransformator);
+		                	 else if(!valueLabel.equals("VOPT"))
+		                		 newValue = UnitTransformator.tranfFromAnyChannelToOtherChannel(newValue,MyConstants.X_AXIS_VRAD,
+		                             MyConstants.X_AXIS_VOPT,spectTransformator);
+
+                    		         values = wcsGlobal.getWcsSpectral().getSt().getValuesFromVeloOpt(newValue);
+
+		                 } else if (wcsGlobal.getWcsSpectral().getVelDef()
+		                         .startsWith(MyConstants.SPECTRAL_AXIS_TYPE_VRAD)) {
+		                	 if(valueLabel.equals("REDSHIFT"))
+		                		 newValue = UnitTransformator.tranfFromAnyChannelToOtherChannel(newValue,MyConstants.X_AXIS_REDSHIFT,
+		                                 MyConstants.X_AXIS_VRAD,spectTransformator);
+
+		                	 else if(valueLabel.equals("VOPT"))
+		                		 newValue = UnitTransformator.tranfFromAnyChannelToOtherChannel(newValue,MyConstants.X_AXIS_VOPT,
+		                             MyConstants.X_AXIS_VRAD,spectTransformator);
+
+                                         values = wcsGlobal.getWcsSpectral().getSt().getValuesFromVeloRad(newValue);
+		                 }
+
+                                 // Actualiza la cabecera con los nuevos valores calculados
+		                 try {
+		                     hdr.addValue(MyConstants.FITS_HEADER_ALTRVAL, newValue, "MODIFY VELOCITY");
+		                     hdr.addValue(MyConstants.FITS_HEADER_ALTRPIX, values[0], "MODIFY VELOCITY");
+		                     hdr.addValue(MyConstants.FITS_HEADER_ZSOURCE, values[5], "MODIFY VELOCITY");
+		                 } catch (HeaderCardException e1) {
+		                     // TODO Auto-generated catch block
+		                     System.out.println(e1.getMessage());
+		                     e1.printStackTrace();
+		                 }
+		  	      }
+
+		            }
+			  }
+		}
+		return newArgs;
+	}
+
+
+
+
+
+
+
+
+
+
+
 }
