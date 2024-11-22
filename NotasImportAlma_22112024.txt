@@ -78,4 +78,11 @@ Hay un nuevo precessHead para insertar cards en la linea 160 del fichero de Java
 a que se debia. El objeto basicHdu cambia, se reasigna en la linea 148 con lo cual tiene sentido que se vuelvan a
 procesar las columnas de datos. 
 
-
+De nuevo hay un metodo que parece estar duplicado en su uso, que es castCrpix. 
+Este metodo lo que hace es ajustar el centro de la imagen en pixeles, esta tambien explicado en este documento.
+El uso duplicado (linea 214 en el codigo original de Carmen) se debe a que en las lineas anteriores (196-206)
+se reajustan las dimensiones del beam, que están ligadas con este valor de Crpix y por tanto tiene sentido que 
+se vuelva a calcular. 
+De todas maneras no parece que sea siempre el reajuste del beam asi que probablemente no deberia de ser siempre
+el castCrpix, pero eso es algo menor. 
+ 
