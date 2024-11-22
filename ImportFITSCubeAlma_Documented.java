@@ -483,6 +483,54 @@ public class ImportFITSCubeAlma extends ImportFITS {
 		return newArgs;
 	}
 
+       /**
+       * Asigna un valor a una etiqueta en la fila de datos (`RowImport`) de acuerdo con su tipo.
+       *
+       * Este método determina el tipo de dato de un valor proporcionado y lo asigna a una etiqueta
+       * específica en la fila de importación actual. Es útil para procesar cabeceras y datos de
+       * archivos FITS donde los valores pueden ser de diferentes tipos (int, float, string, etc.).
+       *
+       * @param typeClass Tipo del valor (int, float, string, etc.) representado por un entero.
+       * @param valueLabel Etiqueta a la que se asignará el valor en la fila de importación.
+       * @param valueData Valor en formato de cadena que será convertido al tipo correspondiente.
+       */
+       public void setValue(int typeClass, String valueLabel, String valueData) {
+           switch (typeClass) {
+               case 0:
+               // Caso de tipo String
+               row.set(valueLabel, valueData);
+               break;
+
+               case 1:
+               // Caso de tipo Integer
+               row.set(valueLabel, Integer.parseInt(valueData));
+               break;
+
+               case 2:
+               // Caso de tipo Short
+               row.set(valueLabel, Short.parseShort(valueData));
+               break;
+
+               case 3:
+               // Caso de tipo Float
+               row.set(valueLabel, Float.parseFloat(valueData));
+               break;
+
+               case 4:
+               // Caso de tipo Double
+               row.set(valueLabel, Double.parseDouble(valueData));
+               break;
+
+               case 5:
+               // Caso de tipo Long
+               row.set(valueLabel, Long.parseLong(valueData));
+               break;
+
+               default:
+               // Caso por defecto: asignar como String
+               row.set(valueLabel, valueData);
+           }
+       }
 
 
 
