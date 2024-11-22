@@ -140,3 +140,31 @@ Integer).
 - Utiliza el método set del objeto row para asociar la etiqueta (valueLabel) con el valor convertido.
 Maneja conversiones seguras desde String a tipos numéricos como int, float, etc.
 Si el tipo no está definido en el switch, se asigna el valor como un String.
+
+
+*******************************
+***Analisis de setBeamValues***
+*******************************
+Este método configura los valores relacionados con el haz (beam) en la fila de datos (RowImport) de un archivo FITS.
+ Los valores incluyen:
+        BMAJ: Tamaño mayor del haz en grados.
+        BMIN: Tamaño menor del haz en grados.
+        BPA: Ángulo de posición del haz en grados.
+Si los valores están en otras unidades, el método realiza la conversión necesaria.
+
+Parámetros:
+    fits: Objeto de la clase Fits que contiene el archivo FITS abierto.
+    row: Objeto RowImport donde se almacenan los valores del haz.
+    crpix3: Índice del eje espectral usado para localizar los valores del haz.
+
+- Primero se obtienen los datos: lee los valores del haz desde un BinaryTableHDU (unidad de datos en formato de tabla 
+binaria) ubicado en la posición 1 del archivo FITS.
+- Una vez leidos verifica si los valores obtenidos son válidos. Si bMaj tiene un valor estándar de "invalidez" (1.0E-6)
+o si bpa es 0, no los procesa.
+- Convierte las unidades: obtiene las unidades de los valores desde la cabecera y los convierte a grados usando la 
+clase Unit.
+- Y por ultimo asigna los valores procesados a la fila row.
+
+Si las unidades (TUNIT1, TUNIT2, TUNIT3) no están definidas en la cabecera, el método usará los valores tal cual están
+ en la tabla.
+Si los valores del haz son inválidos (bMaj = 1.0E-6 o bpa = 0), no se asignan a la fila.
