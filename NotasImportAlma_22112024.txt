@@ -74,5 +74,8 @@ al principio de la clase.
       offset --> getFileOffset + getOriginalSize
      Esto lo hace cuando se cumple esta condición: "if basicHdu instanceof ImageHDU"
 
+Hay un nuevo precessHead para insertar cards en la linea 160 del fichero de Java original (de Carmen) que no sabia
+a que se debia. El objeto basicHdu cambia, se reasigna en la linea 148 con lo cual tiene sentido que se vuelvan a
+procesar las columnas de datos. 
 
 
