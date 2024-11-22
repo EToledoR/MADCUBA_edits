@@ -86,3 +86,34 @@ se vuelva a calcular.
 De todas maneras no parece que sea siempre el reajuste del beam asi que probablemente no deberia de ser siempre
 el castCrpix, pero eso es algo menor. 
  
+Esta linea y este comentario hay que ver si aun tienen sentido y validez para JWST:
+row.set(TELESCOP, MyConstants.TELESCOPE_ALMA_COMMON);// Siempre que se importe un cubo poner como COMON_BEAM>
+
+Hay que mirar y que documentar que es lo que hace el metodo escribCnsolaHeader para ver porque hacemos esta
+linea dspues de asignar el valor COMMON_BEAM.
+
+Analisis de los otros metodos (secundarios) en la clase
+
+*************************************
+***Analisis de changeValuesVeloOld***
+*************************************
+Este método actualiza los valores relacionados con velocidades espectrales y desplazamiento al rojo 
+en la cabecera FITS. Acepta una lista de argumentos con etiquetas (VELO, VRAD, VOPT, REDSHIFT) y realiza las 
+conversiones necesarias para garantizar coherencia entre las unidades y el sistema espectral del archivo.
+
+Parámetros:
+    listNewArgs: Una lista de argumentos en formato etiqueta$valor$unidad.
+    newArgs: Cadena acumulativa con los valores procesados para aplicar cambios.
+    hdr: Cabecera del archivo FITS que se actualizará.
+    wcsGlobal: Objeto que maneja el sistema de coordenadas espectrales y sus conversiones.
+
+- Valida que los argumentos de entrada no sean nulos o vacíos.
+- Divide los argumentos en tokens (por ejemplo, VELO$3000$km/s).
+- Extrae la etiqueta, el valor y la unidad de cada token.
+- Realiza conversiones entre tipos de velocidades (radial, óptica, desplazamiento al rojo) utilizando 
+  SpectralTransformator.
+- Inserta los valores convertidos en la cabecera FITS.
+
+Utiliza UnitTransformator para cambiar entre diferentes sistemas espectrales y unidades (por ejemplo, de km/s a m/s). 
+También se asegura de que las transformaciones sean consistentes con el sistema espectral (VOPT, VRAD, etc.) definido 
+en el objeto WCSGlobal.
