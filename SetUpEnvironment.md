@@ -72,3 +72,14 @@ In MADCORE you need to add the libraries from 'External Libraries' but you need 
 15. Image_5D.jar
 16. imgenes.jar
 
+
+To add and order those libraries in the project folder (usually to the left in your Eclipse window) right click on the project and select Build path > configure build path. 
+Then, first in the tab libraries add all the ones needed, and in the tab 'order and export' ensure that they are in the above specific order. 
+
+In MADCUBA PLUGINS you need to add to the previous imports of libraries an additional one that is the MADCORE project. 
+The MADCORE project should be first one in the ordered list above all the other libraries in the order provided. 
+
+### Running MADCUBA in Eclipse
+After the previous steps, you should be now in a position to run MADCUBA without any build errors. 
+
+To run MADCUBA, in the project MADCUBA PLUGINS, right click and then Run as > Java Application and the main class is MACUBA_IJ
