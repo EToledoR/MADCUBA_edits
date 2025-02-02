@@ -1,2 +1,2 @@
 # MADCUBA
-Repository to hold documenation and work on the MADCUBA project
+Repository to hold documentation and work on the MADCUBA project
