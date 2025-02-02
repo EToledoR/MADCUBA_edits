@@ -36,8 +36,7 @@ Again, to install them go to Help > Instal new Software and type this url as sou
 ### Getting the code
 Once you got the svn plugin and the connector you can get the latest version of the code from the repository from the url:
 
-https://projects2.cab.inta-csic.es/svn/lam/trunk/MADCUBA_IJ
-
+XXXXXXXXXXXXXX
 The correct access and user and password need to be provided by IT Services at CAB. 
 
 MADCUBA codebase is held in three separate java projects:
